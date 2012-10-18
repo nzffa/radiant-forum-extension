@@ -43,7 +43,7 @@ class ForumExtension < Radiant::Extension
       add_item 'Topics', '/admin/forum/topics'
       add_item 'Forums', '/admin/forum/forums'
       add_item 'Posts', '/admin/forum/posts'
-      add_item 'Settings', '/admin/readers/reader_configuration'
+      add_item 'Settings', '/admin/reader_settings'
     end
   end
   
