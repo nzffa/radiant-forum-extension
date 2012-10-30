@@ -1,7 +1,7 @@
 class Topic < ActiveRecord::Base
   has_site if respond_to? :has_site
   has_comments
-  belongs_to :forum
+  belongs_to :forum, :counter_cache => true
 
   validates_presence_of :name
   validates_uniqueness_of :old_id, :allow_nil => true

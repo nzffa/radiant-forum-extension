@@ -111,8 +111,8 @@ module ForumTags
     text = tag.double? ? tag.expand : tag.render('forum:topic:name')
     %{<a href="#{tag.render('forum:topic:url')}#{anchor}"#{attributes}>#{text}</a>}
   end
-  tag 'link' do |tag|
-  end
+  #tag 'link' do |tag|
+  #end
   
   desc %{
     Renders the name of the reader who started the current topic.
