@@ -21,6 +21,7 @@
             %th.action
     %tbody
       - @topics.each do |topic|
+        -next if topic.nil?
         %tr
           - render_region :tbody do |tbody|
             - tbody.title_cell do

@@ -49,10 +49,12 @@ class Topic < ActiveRecord::Base
   end
   
   def reader
+    return nil if posts.empty?
     posts.first.reader
   end
   
   def body
+    return nil if posts.empty?
     posts.first.body
   end
     
