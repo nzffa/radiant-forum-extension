@@ -123,6 +123,8 @@ en:
       search: "Search"
       topics: "Latest"
     new_comment: "Add a comment"
+    new_comment_from: "Comment from"
+    new_topic_from: 'Topic from'
     new_forum: "New forum"
     new_reply: "Add a reply"
     new_reply_to: "New reply to"
