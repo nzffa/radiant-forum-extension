@@ -30,8 +30,10 @@ module ForumHelper
   end
 
   def link_to_topic(topic, options={})
-    title = options.delete(:title) || topic.title 
-    link_to title, topic_url(topic), options
+    if topic
+      title = options.delete(:title) || topic.title
+      link_to title, topic_url(topic), options
+    end
   end
 
   def link_to_post(post, options={})
@@ -46,5 +48,4 @@ module ForumHelper
   def remove_link(post)
     link_to t('forum_extension.delete'), topic_post_url(post.topic, post), :method => 'delete', :class => 'delete_post', :id => "delete_post_#{post.id}", :title => t("remove_post"), :confirm => t('forum_extension.really_remove_post')
   end
-  
 end  
