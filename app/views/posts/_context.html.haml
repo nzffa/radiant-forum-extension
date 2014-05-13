@@ -11,6 +11,6 @@
     = t('forum_extension.reply_posted')
   - if post.reader
     = t('forum_extension.by')
-    = link_to post.reader.name, reader_url(post.reader)
+    = post.reader.name
 - else
   No post!

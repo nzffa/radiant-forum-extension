@@ -46,9 +46,17 @@ class Post < ActiveRecord::Base
       :readonly => false
     } 
   }
-  named_scope :matching, lambda { |term|
+  named_scope :matching, lambda { |term_string|
+    terms = term_string.split(' ')
+    parts = []
+    params = []
+    terms.each do |term|
+      parts << "posts.search_text LIKE ?"
+      params << "%#{stopped(term)}%"
+    end
+
     {
-      :conditions => ["posts.search_text LIKE ?", "%#{stopped(term)}%"] 
+      :conditions => [parts.join(' OR ')] + params
     }
   }
 

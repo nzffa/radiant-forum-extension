@@ -10,7 +10,7 @@
   
 .post{:id => post.dom_id, :class => cssclasses.join(' ')}
   - unless headless
-    = standard_gravatar_for(post.reader)
+    = standard_gravatar_for(post.reader, :false)
   .post_header
     - unless headless
       - if with_context
