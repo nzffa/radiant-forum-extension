@@ -7,7 +7,7 @@
         %p.title
           %label
             = t('forum_extension.topic_name') + ":"
-          = @post.topic.name
+          = @post.topic.name if @post.topic
 
       - form.edit_body do
         %p.content

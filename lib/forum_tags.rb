@@ -146,7 +146,7 @@ module ForumTags
       output << %{<a href="#{reader_path(tag.locals.topic.replied_by)}">#{tag.locals.topic.replied_by.name}</a>}
     else
       output << I18n.t('forum_extension.started_by')
-      output << %{<a href="#{reader_path(tag.locals.topic.reader)}">#{tag.render('forum:topic:author')}</a>}
+      output << tag.render('forum:topic:author')
     end
     output.join(' ')
   end
@@ -272,7 +272,7 @@ module ForumTags
     else
       output << I18n.t('forum_extension.new_topic_from')
     end
-    output << %{<a href="#{reader_path(tag.locals.post.reader)}">#{tag.render('forum:post:author')}</a>}
+    output << tag.render('forum:post:author')
     output << tag.render('forum:post:date')
     output.join(' ')
   end
