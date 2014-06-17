@@ -189,9 +189,9 @@ en:
     search_form:
       forum_label: "In this archive category"
       person_label: "From this person"
-      minimal_query_label: "Forum search"
+      minimal_query_label: "Archives search"
       query_label: "Search for this text"
-    search_header: "Forum Search"
+    search_header: "Archives Search"
     search_introduction: "Please choose a search phrase and/or a person or discussion category."
     search_results: "Search Results"
     search_whole_forum: "search the whole forum"
@@ -226,7 +226,7 @@ en:
     topic_empty: "Topic empty!"
     topic_name: "Topic name"
     topics: "Topics"
-    topics_heading: "Forum"
+    topics_heading: "NZFFA Archives"
     topics_introduction: 'This is a list of all the NZFFA Archives, with the most recently updated first. You can also see a more organised list of <a href="/forum/forums">archive categories</a> or  <a href="/forum/posts">search</a> for particular posts and people.'
     under: "under"
     unknown_date: "unknown date"
