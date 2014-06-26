@@ -346,16 +346,16 @@ module ForumTags
   }
   tag 'comments:each' do |tag|
     results = []
-    if paging = pagination_find_options
-      tag.locals.posts = tag.locals.paginated_list = page.posts.paginate(paging)
+    if tag.attr['paginated'] == 'true'
+      tag.locals.posts = tag.locals.paginated_list = page.posts.paginate(pagination_parameters)
     else
-      tag.locals.posts = page.posts
+      tag.locals.posts = tag.locals.page.posts
     end
     tag.locals.posts.each do |post|
       tag.locals.post = post
       results << tag.expand
     end
-    results << tag.render('pagination', tag.attr.dup) if paging
+    results << tag.render('pagination', tag.attr.dup) if tag.attr['paginated'] == 'true'
     results
   end
 

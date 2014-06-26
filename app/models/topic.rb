@@ -57,6 +57,15 @@ class Topic < ActiveRecord::Base
     return nil if posts.empty?
     posts.first.body
   end
+
+  def body=(value)
+    unless value.blank?
+      post = posts.first || posts.build
+      post.body = value
+      post.save
+    end
+    value
+  end
     
   def title
     name

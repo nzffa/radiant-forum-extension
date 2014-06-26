@@ -4,7 +4,7 @@
 %p.context
   - if topic.reader
     = t('forum_extension.started_by')
-    = link_to post.reader.name, reader_url(post.reader), :class => 'person'
+    = post.reader.name
   = friendly_date(post.created_at)
 
   - if topic.forum
