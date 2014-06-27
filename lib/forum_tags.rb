@@ -396,18 +396,20 @@ module ForumTags
       tag.locals.reader = post.reader
       tag.expand
     else
-      output = %{<div class="post"><div class="wrapper">}
-      output << %{<div class="post_header">}
-      output << %{<h2>#{tag.render("forum:post:reader")}</h2>}
-      output << %{<p class="context">#{tag.render("forum:post:context")}</p>}
+      output =  %{<div class="post">\n}
+      output << %{  <div class="wrapper">\n}
+      output << %{    <div class="post_header">\n}
+      output << %{      <h2>#{tag.render("forum:post:reader")}</h2>\n}
+      output << %{      <p class="context">#{tag.render("forum:post:context")}</p>}
+      output << %{    </div>}
+      output << %{    <div class="post_body">}
+      output <<         tag.render("forum:post:body")
+      output << %{    </div>}
+      output << %{  </div>}
       output << %{</div>}
-      output << %{<div class="post_body">}
-      output << tag.render("forum:post:body")
       output
     end
   end
-
-
 
 
   desc %{
