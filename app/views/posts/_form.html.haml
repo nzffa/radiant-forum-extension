@@ -22,7 +22,7 @@
         %p
           = tf.label :forum_id, nil, :class => "required"
           %br
-          = tf.select :forum_id, Forum.all.collect {|forum| [ forum.name, forum.id ] }, :class=> 'standard'
+          = tf.select :forum_id, Forum.visible_to(current_reader).collect {|forum| [ forum.name, forum.id ] }, :class=> 'standard'
 
   - elsif post.topic
     = f.hidden_field :topic_id
