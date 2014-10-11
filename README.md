@@ -1,3 +1,5 @@
+Note: We are using this extension for group-only access reader created pages. We call this our "archive". 
+
 # Forum
 
 This is a tidy but comprehensive forum implementation that plugs into radiant and supports both discussion forums and page comments. 
