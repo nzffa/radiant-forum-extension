@@ -7,7 +7,7 @@ class ForumsController < ForumBaseController
 
   def show
     @forum = Forum.visible_to(current_reader).find(params[:id])
-    @topics = @forum.topics.stickyfirst.paginate(pagination_parameters)
+    @topics = @forum.topics.stickyfirst.paginate(pagination_parameters.merge(:per_page => Radiant.config['forum.posts_per_page']))
     render_page_or_feed
   end
   
