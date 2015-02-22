@@ -325,6 +325,7 @@ module ForumTags
   end
 
   tag 'comments' do |tag|
+    tag.locals.posts = tag.locals.page.posts
     tag.expand if tag.locals.page.show_comments?
   end
 
