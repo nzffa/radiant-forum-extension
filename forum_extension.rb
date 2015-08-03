@@ -15,6 +15,7 @@ class ForumExtension < Radiant::Extension
     Page.send :include, ForumTags                                              # defines radius tags for highlighting forum content on other pages
     AccountsController.send :helper, ForumHelper                               # provides some linking and other helpers on reader pages
     ReaderSessionsController.send :include, ForumReaderSessionsController      # changes default login destination to the forum front page
+    ReaderHelper.send :include, ForumReaderHelperExtension
     
     unless defined? admin.forum # UI is a singleton
       Radiant::AdminUI.send :include, ForumAdminUI
