@@ -62,7 +62,7 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = t("forum_extension.validation_failure")
+    flash[:error] = "Post invalid: #{@post.errors.inspect}"
     respond_to do |format|
       format.html { render :action => 'new' }
       format.js { render :partial => 'form' }
@@ -95,7 +95,7 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = t("forum_extension.validation_failure")
+    flash[:error] = "Post invalid: #{@post.errors.inspect}"
     respond_to do |format|
       format.html { render :action => 'edit' }
       format.js { render :partial => 'form' }
@@ -135,7 +135,7 @@ protected
   def require_authority
     current_reader.is_admin? || @post.editable_by?(current_reader)      # includes an editable-interval check
   end
-          
+
   def require_unlocked_topic_and_page
     return render_locked if @page && @page.locked?
     return render_locked if @topic && @topic.locked?
