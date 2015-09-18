@@ -62,7 +62,7 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = "Post invalid: #{@post.errors.inspect}"
+    flash[:error] = "Post invalid: #{@post.errors.full_messages.map{|m| "<span class='error'>#{m}</span>"}.join(", ")}"
     respond_to do |format|
       format.html { render :action => 'new' }
       format.js { render :partial => 'form' }
@@ -95,7 +95,7 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = "Post invalid: #{@post.errors.inspect}"
+    flash[:error] = "Post invalid: #{@post.errors.full_messages.map{|m| "<span class='error'>#{m}</span>"}.join(", ")}"
     respond_to do |format|
       format.html { render :action => 'edit' }
       format.js { render :partial => 'form' }
