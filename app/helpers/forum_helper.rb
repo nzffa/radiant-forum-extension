@@ -48,4 +48,12 @@ module ForumHelper
   def remove_link(post)
     link_to t('forum_extension.delete'), topic_post_url(post.topic, post), :method => 'delete', :class => 'delete_post', :id => "delete_post_#{post.id}", :title => t("remove_post"), :confirm => t('forum_extension.really_remove_post')
   end
+  
+  def reader_or_link_to_reader(reader)
+    if Radiant.config['reader.directory_visibility'] == 'public'
+      link_to reader.name, reader_url(reader)
+    else
+      reader.name
+    end
+  end
 end  
