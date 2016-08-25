@@ -3,7 +3,7 @@
 %p 
   Are you sure you want to 
   %strong.warning permanently remove
-  the post by #{@post.reader.name} at #{l @post.created_at} ?
+  the post #{"by #{@post.reader.name}" if @post.reader} created at #{l @post.created_at} ?
 
 %p.buttons
   = button_to("Delete Post", admin_post_url(@post), {:method => 'delete', :confirm => 'Really delete post?', :class => 'button'})
