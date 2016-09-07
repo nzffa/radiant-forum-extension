@@ -56,7 +56,7 @@ class Post < ActiveRecord::Base
     end
 
     {
-      :conditions => [parts.join(' OR ')] + params
+      :conditions => [parts.join(' AND ')] + params
     }
   }
 
