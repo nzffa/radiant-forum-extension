@@ -135,13 +135,7 @@ class Post < ActiveRecord::Base
 
   # so that page comments can be rendered from a radius tag
   def body_html
-    if body
-      #html = RedCloth.new(body, [ :hard_breaks, :filter_html ]).to_html(:textile, :smilies)
-      html = body
-      Sanitize.clean(html, Sanitize::Config::NZFFA)
-    else
-      ""
-    end
+    Sanitize.clean(body.to_s, Sanitize::Config::NZFFA)
   end
     
   def date_html
