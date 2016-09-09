@@ -1,6 +1,7 @@
 module ForumTags
   include Radiant::Taggable
   include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::AssetTagHelper
   include ActionController::UrlWriter
   include I18n
   
@@ -258,6 +259,27 @@ module ForumTags
   end
 
   desc %{
+    Renders the attachments of the current post.
+  }
+  tag 'forum:post:attachments' do |tag|
+    content = []
+    tag.locals.post.attachments.images.each do |att|
+      display_size = Radiant::Config['forum.image_zoom_size'] || :original
+      content << "<a href=\"#{post_attachment_url(att, :only_path => true)}\" class=\"attachment #{att.extension}\"><img src=\"#{post_attachment_url(att, :size => :thumbnail, :only_path => true)}\" /></a>"
+    end
+    if tag.locals.post.attachments.non_images.any?
+      content << "<ul class='attachments non_images'>"
+      tag.locals.post.attachments.non_images.each do |att|
+        content << "<li>"
+        content << "<a href=\"#{post_attachment_url(att, :only_path => true)}\" class=\"attachment #{att.extension}\">#{att.filename}</a>"
+        content << "</li>"
+      end
+      content << "</ul>"
+    end
+    content.join ""
+  end
+
+  desc %{
     Renders a description line for the current post, which is usually something like 
     'comment added by', 'new reply from' or 'new topic begun by' followed by the author's
     name and the colloquial form of the creation date.
@@ -397,18 +419,22 @@ module ForumTags
       tag.locals.reader = post.reader
       tag.expand
     else
-      output =  %{<div class="post">\n}
-      output << %{  <div class="wrapper">\n}
-      output << %{    <div class="post_header">\n}
-      output << %{      <h2>#{tag.render("forum:post:reader")}</h2>\n}
-      output << %{      <p class="context">#{tag.render("forum:post:context")}</p>}
-      output << %{    </div>}
-      output << %{    <div class="post_body">}
-      output <<         tag.render("forum:post:body")
-      output << %{    </div>}
-      output << %{  </div>}
-      output << %{</div>}
-      output
+      <<-EOF
+<div class="post">
+  <div class="wrapper">
+    <div class="post_header">
+      <h2>#{tag.render("forum:post:reader")}</h2>
+      <p class="context">#{tag.render("forum:post:context")}</p>
+    </div>
+    <div class="post_body">
+      #{tag.render("forum:post:body")}
+    </div>
+    <div class="post_attachments">
+      #{tag.render("forum:post:attachments")}
+    </div>
+  </div>
+</div>
+EOF
     end
   end
 
