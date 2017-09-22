@@ -8,7 +8,9 @@
           %label
             = t('forum_extension.topic_name') + ":"
           = @post.topic.name if @post.topic
-
+        %p.reader
+          =f.label 'Reader'
+          =f.collection_select :reader_id, Reader.all, :id, :name
       - form.edit_body do
         %p.content
           = f.label :body, t('forum_extension.post_body')
