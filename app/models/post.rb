@@ -1,7 +1,7 @@
 require 'sanitize'
 class Post < ActiveRecord::Base
   has_site if respond_to? :has_site
-  
+
   belongs_to :reader
   belongs_to :topic
   belongs_to :page
@@ -33,7 +33,7 @@ class Post < ActiveRecord::Base
     end
   end
   # adapted from the usual scope defined in has_groups, since here visibility is set at the forum level
-  named_scope :visible_to, lambda { |reader| 
+  named_scope :visible_to, lambda { |reader|
     conditions = "topics.id IS NULL OR forums.id IS NULL OR pp.group_id IS NULL"
     if reader && reader.group_ids.any?
       ids = reader.group_ids
@@ -44,7 +44,7 @@ class Post < ActiveRecord::Base
       :conditions => conditions,
       :group => column_names.map { |n| self.table_name + '.' + n }.join(','),
       :readonly => false
-    } 
+    }
   }
   named_scope :matching, lambda { |term_string|
     terms = term_string.split(' ')
@@ -67,27 +67,27 @@ class Post < ActiveRecord::Base
   def holder
     page || topic
   end
-  
+
   def title
     holder.title if holder
   end
-    
+
   def comment?
     !!page
   end
-  
+
   def reply?
     !comment? && !first?
   end
-  
+
   def page_when_paginated
     holder.page_for(self)
   end
-  
+
   def forum
     topic.forum unless comment?
   end
-  
+
   def first?
     !holder || holder.new_record? || holder.posts.first == self
   end
@@ -95,27 +95,27 @@ class Post < ActiveRecord::Base
   def locked?
     holder && holder.locked?
   end
-  
+
   def has_replies?
     holder.posts.last != self
   end
-  
+
   def editable_interval
     Radiant::Config['forum.editable_period'].to_i.minutes if Radiant::Config['forum.editable_period']
   end
-  
+
   def still_editable_for
     if editable_interval && still_editable?
-      self.created_at + editable_interval - Time.now 
+      self.created_at + editable_interval - Time.now
     else
       0
     end
   end
-  
+
   def still_editable?
     !editable_interval || Time.now - self.created_at < editable_interval
   end
-  
+
   def editable_by?(reader=nil)
     return false unless reader
     still_editable? && reader.id == reader_id
@@ -137,11 +137,11 @@ class Post < ActiveRecord::Base
   def body_html
     Sanitize.clean(body.to_s, Sanitize::Config::NZFFA)
   end
-    
+
   def date_html
     self.created_at.to_s
   end
-  
+
   def save_attachments(files=nil)
     files.collect {|file| self.attachments.create(:file => file) unless file.blank? } if files
   end
@@ -160,7 +160,7 @@ class Post < ActiveRecord::Base
 
 private
 
-  # this is  rather crude, but it's database-agnostic, doesn't require 
+  # this is  rather crude, but it's database-agnostic, doesn't require
   # any external indexing, and works well enough for most purposes.
   # for a more satisfactory search, tell sphinx to index the search_text field.
 
