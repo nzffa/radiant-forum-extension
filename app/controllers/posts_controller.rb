@@ -3,7 +3,7 @@ class PostsController < ForumBaseController
   before_filter :require_activated_reader, :except => [:index, :show]
   before_filter :find_post, :only => [:show, :edit, :update, :remove, :destroy]
   before_filter :require_unlocked_topic_and_page, :only => [:new, :create]
-  before_filter :build_post, :only => [:new, :create]
+  before_filter :build_post, :only => [:new]
   before_filter :require_authority, :only => [:edit, :update, :destroy]
 
   def index
@@ -56,6 +56,7 @@ class PostsController < ForumBaseController
 
   def create
     flatten_attachments_params
+    build_post
     @post.save!
     Radiant::Cache.clear if @post.page
     respond_to do |format|
@@ -65,7 +66,7 @@ class PostsController < ForumBaseController
   rescue ActiveRecord::RecordInvalid
     flash[:error] = "Post invalid: #{@post.errors.full_messages.map{|m| "<span class='error'>#{m}</span>"}.join(", ")}"
     respond_to do |format|
-      format.html { render :action => 'new' }
+      format.html { redirect_to :back }
       format.js { render :partial => 'form' }
     end
   end
@@ -135,19 +136,22 @@ protected
   end
 
   def flatten_attachments_params
-    attachments = params[:post].delete(:attachments_attributes)
-    params[:post][:attachments_attributes] = {}
-    counter = 0
-    attachments.each do |i, att_fields|
-      if att_fields[:file].to_a.any?
-        att_fields[:file].to_a.each do |uploaded|
+    if attachments = params[:post].delete(:attachments_attributes)
+      params[:post][:attachments_attributes] = {}
+      counter = 0
+      attachments.to_a.each do |i, att_fields|
+        if att_fields[:file]
+          att_fields[:file].each do |uploaded|
+            params[:post][:attachments_attributes][counter.to_s.to_sym] = {}
+            params[:post][:attachments_attributes][counter.to_s.to_sym][:file] = uploaded
+            counter+=1
+          end
+        elsif att_fields[:_destroy]
           params[:post][:attachments_attributes][counter.to_s.to_sym] = {}
-          params[:post][:attachments_attributes][counter.to_s.to_sym][:file] = uploaded
+          params[:post][:attachments_attributes][counter.to_s.to_sym][:_destroy] = attachments[i][:_destroy]
+          params[:post][:attachments_attributes][counter.to_s.to_sym][:id] = attachments[i][:id]
           counter+=1
         end
-      else
-        params[:post][:attachments_attributes][counter.to_s.to_sym] = attachments[i]
-        counter+=1
       end
     end
   end
