@@ -41,9 +41,7 @@
     = yield :title
 
 - content_for :messages do
-  = yield :pagination if @posts.previous_page
   = render :partial => 'posts/post', :collection => @posts, :locals => {:with_context => false}
-  = yield :pagination if @posts.next_page
 
 - content_for :reply_form do
   = render :partial => 'topics/reply'
@@ -54,4 +52,3 @@
   = yield :first_post
   = yield :messages
   = yield :reply_form unless @posts.next_page
-
