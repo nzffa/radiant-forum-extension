@@ -11,11 +11,14 @@
         %p.reader
           =f.label 'Reader'
           =f.collection_select :reader_id, Reader.all, :id, :name
+        %p.edit_timestamp
+          = f.label 'Timestamp'
+          = f.datetime_select :created_at
       - form.edit_body do
         %p.content
           = f.label :body, t('forum_extension.post_body')
           = f.text_area :body, :class => "textarea", :style => "width: 100%"
-        
+
         .post_attachments
           %h4= t('forum_extension.attached') + ':'
           - @post.attachments.images.each do |att|
@@ -26,10 +29,8 @@
               - @post.attachments.non_images.each do |att|
                 %li
                   = link_to att.filename, post_attachment_url(att), :class => "attachment #{att.extension}"
-  
+
   - render_region :form_bottom do |form_bottom|
-    -#- form_bottom.edit_timestamp do
-      -#= updated_stamp @post  
     - form_bottom.edit_buttons do
       %p.buttons
         = save_model_button(@post)
