@@ -9,7 +9,6 @@ class TopicsController < ForumBaseController
     @topic = Topic.visible_to(current_reader).find(params[:id])
     @forum = @topic.forum
     @posts = @topic.replies.reverse
-    @posts.unshift(@posts.pop) # because the oldest post is the topic, the others are rendered new to old 
     render_page_or_feed
   end
 
