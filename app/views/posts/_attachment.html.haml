@@ -5,4 +5,6 @@
   - else
     = link_to attachment.filename, post_attachment_url(attachment), :class => "attachment #{attachment.extension}"
   - if af
+    %br
     = af.check_box :_destroy, :class => 'checkbox'
+    Check to remove this file if you want to replace it with another
