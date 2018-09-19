@@ -16,9 +16,6 @@
     = t('reader_extension.separator')
     = yield :parent
 
-- content_for :person do
-  = standard_gravatar_for(@post.reader, :false)
-
 - content_for :title do
   -if @post.page
     = t('forum_extension.comment_on') + @post.page.title
@@ -34,4 +31,3 @@
 
 .forum
   = yield :messages
-

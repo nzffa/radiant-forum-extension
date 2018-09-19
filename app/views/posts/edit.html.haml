@@ -2,13 +2,10 @@
   %p.context
     = render :partial => 'posts/context'
 
-- content_for :person do
-  = standard_gravatar_for(@post.reader, :false)
-
 - content_for :title do
   - if @post.page
     = t('forum_extension.edit_comment')
-  - elsif @post.first? 
+  - elsif @post.first?
     = t('forum_extension.edit_topic')
   - else
     = t('forum_extension.edit_reply')
@@ -25,7 +22,7 @@
     = render :partial => 'form', :locals => {:post => @post}
   - else
     = render :partial => 'ineditable', :locals => {:post => @post}
-  
+
 = render :partial => 'shared/standard_forum_parts'
 
 .forum

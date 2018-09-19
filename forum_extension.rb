@@ -15,26 +15,25 @@ class ForumExtension < Radiant::Extension
     Page.send :include, ForumTags                                              # defines radius tags for highlighting forum content on other pages
     AccountsController.send :helper, ForumHelper                               # provides some linking and other helpers on reader pages
     ReaderSessionsController.send :include, ForumReaderSessionsController      # changes default login destination to the forum front page
-    ReaderHelper.send :include, ForumReaderHelperExtension
-    
+
     unless defined? admin.forum # UI is a singleton
       Radiant::AdminUI.send :include, ForumAdminUI
       Radiant::AdminUI.load_forum_extension_regions
     end
-    
+
     admin.page.edit.add :layout, "edit_commentability"
     admin.reader_configuration.show.add :settings, "forum", :after => "administration"
     admin.reader_configuration.edit.add :form, "edit_forum", :after => "administration"
     admin.account.dashboard.add :main, 'dashboard/posts'
     admin.account.show.add :main, 'accounts/posts'
-  
+
     if defined? RedCloth::DEFAULT_RULES
       RedCloth.send :include, ForumRedCloth3
       RedCloth::DEFAULT_RULES.push(:smilies)
     else
       RedCloth::TextileDoc.send :include, ForumRedCloth4
     end
-    
+
     if admin.respond_to?(:dashboard)
       Admin::DashboardController.send :helper, ForumHelper
       admin.dashboard.index.add :main, 'forum_dashboard', :before => 'recent_assets'
@@ -47,5 +46,5 @@ class ForumExtension < Radiant::Extension
       add_item 'Settings', '/admin/reader_settings'
     end
   end
-  
+
 end

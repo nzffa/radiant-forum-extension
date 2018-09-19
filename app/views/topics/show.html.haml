@@ -4,9 +4,6 @@
 - content_for :context do
   = render :partial => 'topics/context'
 
-- content_for :person do
-  = standard_gravatar_for(@topic.reader, :false)
-
 - content_for :first_post do
   = render :partial => 'posts/post', :locals => {:post => @topic.posts.first, :headless => true, :with_context => true}
 
