@@ -64,14 +64,14 @@ module ForumTags
     The post tags will refer to the latest reply (or to the first post if there are no replies).
   }
   tag 'forum:topics:each' do |tag|
-    output = ""
+    output = []
     limit = (tag.attr['limit'] || 10).to_i
     Topic.latest(limit).each do |topic|
       tag.locals.topic = topic
       tag.locals.post = topic.posts.last
       output << tag.expand
     end
-    output
+    output.join ' '
   end
 
   tag 'forum:topic' do |tag|
@@ -138,7 +138,7 @@ module ForumTags
     Renders the usual context line for the current topic, but with no date.
   }
   tag 'forum:topic:context' do |tag|
-    output = ""
+    output = []
     topic = tag.locals.topic
     if tag.locals.topic.has_replies?
       output << I18n.t('forum_extension.reply_from')
@@ -147,7 +147,7 @@ module ForumTags
       output << I18n.t('forum_extension.started_by')
       output << tag.render('forum:topic:author')
     end
-    output
+    output.join ' '
   end
 
   desc %{
@@ -181,7 +181,7 @@ module ForumTags
     Supply a `limit` attribute to set the number of posts shown. The default is 10.
   }
   tag 'forum:posts:each' do |tag|
-    results = ""
+    results = []
     limit = (tag.attr['limit'] || 10).to_i
     Post.latest(limit).each do |post|
       tag.locals.post = post
@@ -189,7 +189,7 @@ module ForumTags
       tag.locals.page = post.page
       results << tag.expand
     end
-    results
+    results.join ' '
   end
 
   desc %{
@@ -260,7 +260,7 @@ module ForumTags
     Renders the attachments of the current post.
   }
   tag 'forum:post:attachments' do |tag|
-    content = ""
+    content = []
     tag.locals.post.attachments.images.each do |att|
       display_size = Radiant::Config['forum.image_zoom_size'] || :original
       content << "<a href=\"#{post_attachment_url(att, :only_path => true)}\" class=\"attachment #{att.extension}\"><img src=\"#{post_attachment_url(att, :size => :thumbnail, :only_path => true)}\" /></a>"
@@ -274,7 +274,7 @@ module ForumTags
       end
       content << "</ul>"
     end
-    content
+    content.join ' '
   end
 
   desc %{
@@ -283,7 +283,7 @@ module ForumTags
     name and the colloquial form of the creation date.
   }
   tag 'forum:post:context' do |tag|
-    output = ""
+    output = []
     post = tag.locals.post
     if post.page
       output << I18n.t('forum_extension.new_comment_from')
@@ -294,7 +294,7 @@ module ForumTags
     end
     output << tag.render('forum:post:author')
     output << tag.render('forum:post:date')
-    output
+    output.join ' '
   end
 
   desc %{
@@ -366,7 +366,7 @@ module ForumTags
     work: there is no topic to show.
   }
   tag 'comments:each' do |tag|
-    results = ""
+    results = []
     if tag.attr['paginated'] == 'true'
       tag.locals.posts = tag.locals.paginated_list = page.posts.paginate(pagination_parameters)
     else
@@ -377,7 +377,7 @@ module ForumTags
       results << tag.expand
     end
     results << tag.render('pagination', tag.attr.dup) if tag.attr['paginated'] == 'true'
-    results
+    results.join ' '
   end
 
   desc %{
@@ -483,12 +483,12 @@ EOF
     tag.expand
   end
   tag "group:forums:each" do |tag|
-    result = ""
+    result = []
     tag.locals.forums.each do |forum|
       tag.locals.forum = forum
       result << tag.expand
     end
-    result
+    result.join ' '
   end
 
   desc %{
@@ -502,12 +502,12 @@ EOF
     tag.expand
   end
   tag "group:latest_topics:each" do |tag|
-    result = ""
+    result = []
     tag.locals.topics.each do |topic|
       tag.locals.topic = topic
       result << tag.expand
     end
-    result
+    result.join ' '
   end
 
   desc %{
