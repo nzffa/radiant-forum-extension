@@ -50,10 +50,14 @@ module ForumHelper
   end
   
   def reader_or_link_to_reader(reader)
-    if Radiant.config['reader.directory_visibility'] == 'public'
-      link_to reader.name, reader_url(reader)
+    if reader.nil?
+      t('forum_extension.reader_deleted')
     else
-      reader.name
+      if Radiant.config['reader.directory_visibility'] == 'public'
+        link_to reader.name, reader_url(reader)
+      else
+        reader.name
+      end
     end
   end
 end  
