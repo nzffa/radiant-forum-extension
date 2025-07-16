@@ -51,7 +51,7 @@ en:
     comment_count:
       zero: "No posts yet"
       one: "One post"
-      other: "%{count} post."
+      other: "%{count} posts."
     comment_count_from:
       zero: "No posts."
       one: "One post, from "

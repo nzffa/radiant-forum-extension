@@ -16,7 +16,7 @@ module ForumHelper
   def paginated_post_url(post)
     param_name = WillPaginate::ViewHelpers.pagination_options[:param_name]
     if post.page
-      "post.page.url?#{param_name}=#{post.page_when_paginated}##{post.dom_id}"
+      "#{post.page.url}?#{param_name}=#{post.page_when_paginated}##{post.dom_id}"
     elsif post.first?
       topic_post_url(post.topic, post)
     else

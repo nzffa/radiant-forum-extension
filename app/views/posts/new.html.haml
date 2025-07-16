@@ -1,6 +1,3 @@
-- content_for :person do
-  = standard_gravatar_for(current_reader)
-  
 - content_for :context do
   %p.context
     = t('forum_extension.if_you_not', :name => current_reader.name)
@@ -9,7 +6,7 @@
 - content_for :title do
   - if @page
     = t('forum_extension.new_comment')
-  - elsif @topic 
+  - elsif @topic
     = t('forum_extension.new_reply')
   - else
     = t('forum_extension.new_topic')
@@ -17,7 +14,7 @@
 - content_for :breadhead do
   - if @page
     = link_to @page.title, @page.url, :class => 'breadhead'
-  - elsif @topic 
+  - elsif @topic
     = link_to_topic(@topic, :class => 'breadhead')
 
 - content_for :form do
@@ -28,4 +25,3 @@
 
 .forum
   = yield :form
-

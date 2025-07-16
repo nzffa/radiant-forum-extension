@@ -11,9 +11,6 @@
   %p.context
     = render :partial => 'posts/context'
 
-- content_for :person do
-  = standard_gravatar_for(@post.reader, :false)
-
 - content_for :title do
   - if @post.page
     = t('forum_extension.confirm_remove_comment')

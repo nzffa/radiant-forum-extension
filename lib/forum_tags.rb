@@ -1,9 +1,10 @@
 module ForumTags
   include Radiant::Taggable
   include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::AssetTagHelper
   include ActionController::UrlWriter
   include I18n
-  
+
   class TagError < StandardError; end
 
   tag 'forum_css' do |tag|
@@ -31,9 +32,9 @@ module ForumTags
   end
 
   desc %{
-    Renders a standard list of recent topics. 
+    Renders a standard list of recent topics.
     Pass a 'limit' parameter to set the length of the list: default is 10.
-    
+
     <pre><code>
       <r:forum:topics:latest limit="5" />
       # is the same as:
@@ -70,7 +71,7 @@ module ForumTags
       tag.locals.post = topic.posts.last
       output << tag.expand
     end
-    output
+    output.join ' '
   end
 
   tag 'forum:topic' do |tag|
@@ -82,12 +83,12 @@ module ForumTags
   desc %{
     Renders a standard, minimal topic list item consisting of link and explanation.
     This is the shorthand used by forum:topics:latest but it can also be used in other settings.
-    
+
     <pre><code>
       <r:forum:topic:summary />
       # is the same as:
       <li><r:forum:topic:link /><br /><r:forum:topic:context /></li>
-    </code></pre>    
+    </code></pre>
   }
   tag 'forum:topic:summary' do |tag|
     "<li>#{tag.render('forum:topic:link')}<br />#{tag.render('forum:topic:context')}</li>"
@@ -111,9 +112,7 @@ module ForumTags
     text = tag.double? ? tag.expand : tag.render('forum:topic:name')
     %{<a href="#{tag.render('forum:topic:url')}#{anchor}"#{attributes}>#{text}</a>}
   end
-  #tag 'link' do |tag|
-  #end
-  
+
   desc %{
     Renders the name of the reader who started the current topic.
   }
@@ -148,7 +147,7 @@ module ForumTags
       output << I18n.t('forum_extension.started_by')
       output << tag.render('forum:topic:author')
     end
-    output.join(' ')
+    output.join ' '
   end
 
   desc %{
@@ -172,13 +171,13 @@ module ForumTags
   desc %{
     Loops over the posts most recently added. In effect this is very similar to calling
     r:topics:each, but there are some differences:
-    
+
     * page comments and any other non-topic posts are included
-    * here r:post tags always refer to the current post. 
+    * here r:post tags always refer to the current post.
       Within the topics:each loop they always refer to the last reply to that topic.
     * tag.locals.page is set if the foreground post is a page comment, so you can use
       all the usual radius tags for that page.
-    
+
     Supply a `limit` attribute to set the number of posts shown. The default is 10.
   }
   tag 'forum:posts:each' do |tag|
@@ -190,28 +189,28 @@ module ForumTags
       tag.locals.page = post.page
       results << tag.expand
     end
-    results
+    results.join ' '
   end
 
   desc %{
     This tag is generally used in double form or as a silent prefix, where it will just expand:
-    
+
     <pre><code>
       <r:forum:post><r:link /></r:forum:post>
       # or just
       <r:forum:post:link />
     </code></pre>
-    
-    But if used in single form it will return a standard, minimal post list item 
+
+    But if used in single form it will return a standard, minimal post list item
     consisting of link and explanation:
-    
+
     <pre><code>
       <r:forum:post />
       # is the same as:
       <li><r:forum:post:link /><br /><r:forum:post:context /></li>
     </code></pre>
-    
-    Note that the text of the link will be the name of the topic or page to which this post is attached, 
+
+    Note that the text of the link will be the name of the topic or page to which this post is attached,
     and that within a topics:each loop any r:forum:post tags will show the last post to the topic.
   }
   tag 'forum:post' do |tag|
@@ -219,7 +218,7 @@ module ForumTags
     raise TagError, "can't have forum:post without a post" unless tag.locals.post
     tag.expand if tag.locals.post
   end
-  
+
   desc %{
     Renders a url (with pagination and anchor) for the current post. Within a topics:each loop this
     is a way to link to the last post.
@@ -258,7 +257,28 @@ module ForumTags
   end
 
   desc %{
-    Renders a description line for the current post, which is usually something like 
+    Renders the attachments of the current post.
+  }
+  tag 'forum:post:attachments' do |tag|
+    content = []
+    tag.locals.post.attachments.images.each do |att|
+      display_size = Radiant::Config['forum.image_zoom_size'] || :original
+      content << "<a href=\"#{post_attachment_url(att, :only_path => true)}\" class=\"attachment #{att.extension}\"><img src=\"#{post_attachment_url(att, :size => :thumbnail, :only_path => true)}\" /></a>"
+    end
+    if tag.locals.post.attachments.non_images.any?
+      content << "<ul class='attachments non_images'>"
+      tag.locals.post.attachments.non_images.each do |att|
+        content << "<li>"
+        content << "<a href=\"#{post_attachment_url(att, :only_path => true)}\" class=\"attachment #{att.extension}\">#{att.filename}</a>"
+        content << "</li>"
+      end
+      content << "</ul>"
+    end
+    content.join ' '
+  end
+
+  desc %{
+    Renders a description line for the current post, which is usually something like
     'comment added by', 'new reply from' or 'new topic begun by' followed by the author's
     name and the colloquial form of the creation date.
   }
@@ -274,7 +294,7 @@ module ForumTags
     end
     output << tag.render('forum:post:author')
     output << tag.render('forum:post:date')
-    output.join(' ')
+    output.join ' '
   end
 
   desc %{
@@ -325,6 +345,7 @@ module ForumTags
   end
 
   tag 'comments' do |tag|
+    tag.locals.posts = tag.locals.page.posts
     tag.expand if tag.locals.page.show_comments?
   end
 
@@ -340,8 +361,8 @@ module ForumTags
   end
 
   desc %{
-    Loops over the (paginated) comment set in ascending order of date. Within the loop you can 
-    use the r:comment shorthand or any r:forum:post:* tags. Note that r:forum:topic tags won't 
+    Loops over the (paginated) comment set in ascending order of date. Within the loop you can
+    use the r:comment shorthand or any r:forum:post:* tags. Note that r:forum:topic tags won't
     work: there is no topic to show.
   }
   tag 'comments:each' do |tag|
@@ -356,15 +377,15 @@ module ForumTags
       results << tag.expand
     end
     results << tag.render('pagination', tag.attr.dup) if tag.attr['paginated'] == 'true'
-    results
+    results.join ' '
   end
 
   desc %{
     A useful shortcut: To enable page commenting, all you have to do is put this in your layout:
 
     <pre><code><r:comments:all /></code></pre>
-    
-    It will display a (paginated) list of page comments followed by an 'add comment' link that you 
+
+    It will display a (paginated) list of page comments followed by an 'add comment' link that you
     can hook into using the supplied forum javascript or your own equivalent.
   }
   tag 'comments:all' do |tag|
@@ -387,7 +408,7 @@ module ForumTags
   end
 
   desc %{
-    A useful shortcut that renders an entire post - in much the same way as a post would appear 
+    A useful shortcut that renders an entire post - in much the same way as a post would appear
     in the forum - so that it can be displayed as a comment on the page.
   }
   tag 'comment' do |tag|
@@ -396,25 +417,29 @@ module ForumTags
       tag.locals.reader = post.reader
       tag.expand
     else
-      output =  %{<div class="post">\n}
-      output << %{  <div class="wrapper">\n}
-      output << %{    <div class="post_header">\n}
-      output << %{      <h2>#{tag.render("forum:post:reader")}</h2>\n}
-      output << %{      <p class="context">#{tag.render("forum:post:context")}</p>}
-      output << %{    </div>}
-      output << %{    <div class="post_body">}
-      output <<         tag.render("forum:post:body")
-      output << %{    </div>}
-      output << %{  </div>}
-      output << %{</div>}
-      output
+      <<-EOF
+<div class="post">
+  <div class="wrapper">
+    <div class="post_header">
+      <h2>#{tag.render("forum:post:reader")}</h2>
+      <p class="context">#{tag.render("forum:post:context")}</p>
+    </div>
+    <div class="post_body">
+      #{tag.render("forum:post:body")}
+    </div>
+    <div class="post_attachments">
+      #{tag.render("forum:post:attachments")}
+    </div>
+  </div>
+</div>
+EOF
     end
   end
 
 
   desc %{
     Expands if this group has any forums.
-    
+
     <pre><code><r:group:if_forums>...</r:group:if_forums></code></pre>
   }
   tag "group:if_forums" do |tag|
@@ -423,7 +448,7 @@ module ForumTags
 
   desc %{
     Expands if this group does not have any forums.
-    
+
     <pre><code><r:group:unless_forums>...</r:group:unless_forums></code></pre>
   }
   tag "group:unless_forums" do |tag|
@@ -432,7 +457,7 @@ module ForumTags
 
   desc %{
     Expands if this group has any topics.
-    
+
     <pre><code><r:group:if_topics>...</r:group:if_topics></code></pre>
   }
   tag "group:if_topics" do |tag|
@@ -441,7 +466,7 @@ module ForumTags
 
   desc %{
     Expands if this group does not have any topics.
-    
+
     <pre><code><r:group:unless_topics>...</r:group:unless_topics></code></pre>
   }
   tag "group:unless_topics" do |tag|
@@ -450,7 +475,7 @@ module ForumTags
 
   desc %{
     Loops through the forums belonging to this group.
-    
+
     <pre><code><r:group:forums:each>...</r:group:forums:each /></code></pre>
   }
   tag "group:forums" do |tag|
@@ -463,12 +488,12 @@ module ForumTags
       tag.locals.forum = forum
       result << tag.expand
     end
-    result
+    result.join ' '
   end
 
   desc %{
     Loops through the latest topics in all forums belonging to this group.
-    
+
     <pre><code><r:group:latest_topics:each count="10">...</r:group:latest_topics:each></code></pre>
   }
   tag "group:latest_topics" do |tag|
@@ -482,13 +507,13 @@ module ForumTags
       tag.locals.topic = topic
       result << tag.expand
     end
-    result
+    result.join ' '
   end
 
   desc %{
-    If the group has only one forum, this presents a simple new-topic link around the supplied text. 
+    If the group has only one forum, this presents a simple new-topic link around the supplied text.
     If it has several forums, this offers a list with the supplied text as the heading.
-    
+
     <pre><code><r:group:new_topic_link /></code></pre>
   }
   tag "group:new_topic_link" do |tag|

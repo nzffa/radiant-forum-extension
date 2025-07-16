@@ -15,12 +15,7 @@
     %p 
       = t('forum_extension.no_forums')
   - else
-    = yield :pagination if @forums.previous_page
     = render :partial => 'forums/forum', :collection => @forums
-    = yield :pagination if @forums.next_page
-
-- content_for :pagination do
-  = pagination_and_summary_for(@forums, t('forum_extension.forum'))
 
 - content_for :feedurl do
   = forums_path(:format => :rss)

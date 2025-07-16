@@ -8,6 +8,11 @@
           = f.text_field :name, :class => 'textbox', :maxlength => 100
 
       - form.edit_body do
+        %span.quiet
+          = f.check_box :sticky
+          = f.label :sticky, nil, :class => 'minor'
+          = f.check_box :locked
+          = f.label :locked, nil, :class => 'minor'
         %p.body
           = f.label :body, t('forum_extension.topic_body')
           = f.text_area :body, :class => "textarea", :style => "width: 100%"

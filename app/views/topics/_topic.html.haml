@@ -3,11 +3,10 @@
 %div{:id => topic.dom_id}
   .post
     .wrapper
-      = standard_gravatar_for(post.reader, topic_url(topic))
       .post_header
         %h2
           = link_to_topic(topic)
-          
+
         = render :partial => "topics/context", :locals => {:topic => topic}
 
       .post_body

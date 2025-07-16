@@ -1,22 +1,48 @@
-- form_for [:admin, @post] do |f|
+- form_for [:admin, @post], :html => { :multipart => true } do |f|
   = hidden_field 'forum', 'lock_version'
   = render_region :form_top
   .form-area
     - render_region :form do |form|
       - form.show_name do
+        - if @post.errors && !@post.errors.empty?
+          %p#post_errors
+            %strong= @post.errors.full_messages.to_sentence
         %p.title
           %label
             = t('forum_extension.topic_name') + ":"
           = @post.topic.name if @post.topic
-
+        %p.reader
+          =f.label 'Reader'
+          =f.collection_select :reader_id, Reader.all, :id, :name
+        %p.edit_timestamp
+          = f.label 'Timestamp'
+          = f.datetime_select :created_at
       - form.edit_body do
         %p.content
           = f.label :body, t('forum_extension.post_body')
           = f.text_area :body, :class => "textarea", :style => "width: 100%"
-  
+
+        .post_attachments
+          - display_size = Radiant::Config['forum.image_zoom_size'] || :original
+          %h4= t('forum_extension.attached') + ':'
+          %ul.attachments
+            - @post.attachments.each do |attachment|
+              - f.fields_for :attachments, attachment do |af|
+                %li
+                  - if attachment.image?
+                    = link_to image_tag(post_attachment_url(attachment.id, :size => :thumbnail)), post_attachment_url(attachment.id), :class => 'thumbnail', :rel => post_attachment_url(attachment.id, :size => :original)
+                  - else
+                    = link_to attachment.filename, post_attachment_url(attachment.id), :class => "attachment #{attachment.extension}", :rel => post_attachment_url(attachment.id, :size => :original)
+                  %br
+                  = af.check_box :_destroy, :class => 'checkbox'
+                  Check to remove this file if you want to replace it with another
+          %ul.uploads
+            .selector
+              - new_attachment = @post.attachments.build
+              - f.fields_for :attachments, new_attachment do |naf|
+                = naf.file_field :file, :class => 'filefield', :multiple => 'true'
+                You can select and upload multiple files
   - render_region :form_bottom do |form_bottom|
-    -#- form_bottom.edit_timestamp do
-      -#= updated_stamp @post  
     - form_bottom.edit_buttons do
       %p.buttons
         = save_model_button(@post)

@@ -31,7 +31,7 @@
 
 - content_for :messages do
   - if @topics.empty?
-    %p 
+    %p
       = t('forum_extension.no_topics')
   - else
     = yield :pagination if @topics.previous_page

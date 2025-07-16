@@ -1,9 +1,9 @@
 class PostsController < ForumBaseController
-  
+
   before_filter :require_activated_reader, :except => [:index, :show]
   before_filter :find_post, :only => [:show, :edit, :update, :remove, :destroy]
   before_filter :require_unlocked_topic_and_page, :only => [:new, :create]
-  before_filter :build_post, :only => [:new, :create]
+  before_filter :build_post, :only => [:new]
   before_filter :require_authority, :only => [:edit, :update, :destroy]
 
   def index
@@ -53,8 +53,10 @@ class PostsController < ForumBaseController
       }
     end
   end
-  
+
   def create
+    flatten_attachments_params
+    build_post
     @post.save!
     Radiant::Cache.clear if @post.page
     respond_to do |format|
@@ -62,31 +64,32 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = t("forum_extension.validation_failure")
+    flash[:error] = "Post invalid: #{@post.errors.full_messages.map{|m| "<span class='error'>#{m}</span>"}.join(", ")}"
     respond_to do |format|
-      format.html { render :action => 'new' }
+      format.html { redirect_to :back }
       format.js { render :partial => 'form' }
     end
   end
 
   def edit
-    respond_to do |format| 
+    respond_to do |format|
       format.html {
         @inline = false
         render
       }
-      format.js { 
+      format.js {
         @inline = true
         if current_reader.is_moderator?(@post) || @post.editable_by?(current_reader)
-          render :partial => 'form' 
+          render :partial => 'form'
         else
-          render :partial => 'ineditable' 
+          render :partial => 'ineditable'
         end
       }
     end
   end
-  
+
   def update
+    flatten_attachments_params
     @post.attributes = params[:post]
     @post.save!
     Radiant::Cache.clear if @post.page || (@post.topic && Radiant.config['forum.cached?'])
@@ -95,7 +98,7 @@ class PostsController < ForumBaseController
       format.js { render :partial => 'post' }
     end
   rescue ActiveRecord::RecordInvalid
-    flash[:error] = t("forum_extension.validation_failure")
+    flash[:error] = "Post invalid: #{@post.errors.full_messages.map{|m| "<span class='error'>#{m}</span>"}.join(", ")}"
     respond_to do |format|
       format.html { render :action => 'edit' }
       format.js { render :partial => 'form' }
@@ -117,9 +120,9 @@ class PostsController < ForumBaseController
     else
       @post.destroy
       respond_to do |format|
-        format.html { 
+        format.html {
           flash[:notice] = t("forum_extension.post_removed")
-          redirect_to_page_or_topic 
+          redirect_to_page_or_topic
         }
         format.js { render :partial => 'post' }
       end
@@ -132,10 +135,31 @@ protected
     @post ||= Post.visible_to(current_reader).find(params[:id])
   end
 
+  def flatten_attachments_params
+    if attachments = params[:post].delete(:attachments_attributes)
+      params[:post][:attachments_attributes] = {}
+      counter = 0
+      attachments.to_a.each do |i, att_fields|
+        if att_fields[:file]
+          att_fields[:file].each do |uploaded|
+            params[:post][:attachments_attributes][counter.to_s.to_sym] = {}
+            params[:post][:attachments_attributes][counter.to_s.to_sym][:file] = uploaded
+            counter+=1
+          end
+        elsif att_fields[:_destroy]
+          params[:post][:attachments_attributes][counter.to_s.to_sym] = {}
+          params[:post][:attachments_attributes][counter.to_s.to_sym][:_destroy] = attachments[i][:_destroy]
+          params[:post][:attachments_attributes][counter.to_s.to_sym][:id] = attachments[i][:id]
+          counter+=1
+        end
+      end
+    end
+  end
+
   def require_authority
     current_reader.is_admin? || @post.editable_by?(current_reader)      # includes an editable-interval check
   end
-          
+
   def require_unlocked_topic_and_page
     return render_locked if @page && @page.locked?
     return render_locked if @topic && @topic.locked?
@@ -148,5 +172,5 @@ protected
     @post.page ||= @page
     @post.topic ||= @topic
   end
-    
+
 end
