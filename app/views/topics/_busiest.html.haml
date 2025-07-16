@@ -7,7 +7,11 @@
       %br
       %span.context
         = t('forum_extension.started_by')
-        = link_to(topic.reader.name, reader_url(topic.reader)) + ', '
+        - if topic.reader
+          = link_to(topic.reader.name, reader_url(topic.reader)) + ', '
+        - else
+          %span.deleted
+            = t('forum_extension.reader_deleted')
         = t('forum_extension.now_has')
         = topic.posts.count
         = t('forum_extension.posts') + '.'
